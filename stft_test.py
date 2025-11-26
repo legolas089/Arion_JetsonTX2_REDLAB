@@ -135,4 +135,4 @@ if __name__ == "__main__":
     plt.ylabel("Frequency (Hz)")
     plt.title(f"Segment {seg_idx} STFT magnitude (0~64 Hz)")
     plt.tight_layout()
-    plt.show()
+    plt.savefig("stft_segment_example.png", dpi=150)
