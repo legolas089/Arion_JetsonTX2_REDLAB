@@ -72,15 +72,8 @@ def main():
     onnx.checker.check_model(onnx_model)
     print("[ONNX] checker: OK (model structure valid)")
 
-    # 입력/출력 이름 자동 추출
-    graph = onnx_model.graph
-    input_name = graph.input[0].name
-    output_name = graph.output[0].name
-    print(f"[ONNX] input name : {input_name}")
-    print(f"[ONNX] output name: {output_name}")
-
     # -----------------------------
-    # 3) ONNX Runtime로 추론
+    # 3) ONNX Runtime로 추론 (입출력 이름을 세션에서 안전하게 읽기)
     # -----------------------------
     try:
         import onnxruntime as ort
@@ -89,16 +82,31 @@ def main():
         print("  → `pip install onnxruntime` 후 다시 실행하세요.")
         return
 
-    sess = ort.InferenceSession(
-        str(onnx_path),
-        providers=["CPUExecutionProvider"],  # Jetson에서는 CPU로만 테스트
-    )
+    sess = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
+
+    # 세션에서 실제 입력/출력 정보 확인
+    inputs = sess.get_inputs()
+    outputs = sess.get_outputs()
+
+    if len(inputs) == 0 or len(outputs) == 0:
+        raise RuntimeError(f"[ONNXRuntime] 입력({len(inputs)}), 출력({len(outputs)}) 개수가 0입니다. 모델을 확인하세요.")
+
+    input_name = inputs[0].name
+    output_name = outputs[0].name
+
+    print(f"[ONNXRuntime] input[0] name : {input_name}, shape: {inputs[0].shape}")
+    print(f"[ONNXRuntime] output[0] name: {output_name}, shape: {outputs[0].shape}")
+
+    # 우리가 사용하는 x_np shape가 모델 입력과 대략 맞는지 한 번 체크 (batch 차원만 다를 수 있음)
+    model_in_shape = inputs[0].shape  # 예: [1, 12, 64, 50] 또는 ['N', 12, 64, 50]
+    if len(model_in_shape) != x_np.ndim:
+        raise RuntimeError(f"[ONNXRuntime] 입력 차원 수 불일치: 모델 {model_in_shape}, x_np {x_np.shape}")
+
+    # 필요하면 여기서 shape 더 엄격하게 검사 가능
 
     ort_logits = sess.run([output_name], {input_name: x_np})[0]
     probs_ort = torch.softmax(torch.from_numpy(ort_logits), dim=1).numpy()
 
-    print("[ONNXRuntime] logits shape:", ort_logits.shape)
-    print("[ONNXRuntime] sample probs:", np.round(probs_ort[0], 4))
 
     # -----------------------------
     # 4) PyTorch vs ONNX 결과 비교
