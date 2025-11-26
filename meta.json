@@ -1,0 +1,16 @@
+{
+  "model_name": "cnn12",
+  "version": "0.1.0",
+  "artifact": {
+    "onnx": "cnn12_static.onnx",
+    "opset": 11,
+    "precision": "FP32",
+    "input": {"shape": [1,12,64,50], "dtype": "float32", "layout": "NCHW"},
+    "output": {"name": "logits", "shape": [1,4], "dtype": "float32"}
+  },
+  "preprocessing": {
+    "source": "DSP",
+    "stft": {"fs": 4000, "win": 200, "hop": 100, "nfft": 128, "window": "hann", "scale": "amplitude"},
+    "normalization": "minmax_per_sample"
+  }
+}
