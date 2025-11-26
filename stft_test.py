@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-
+import time
 # ==========================
 # 1) dat 파일 읽기
 # ==========================
@@ -95,9 +95,12 @@ def stft_segments(
 # ==========================
 # 3) 예시 실행부
 # ==========================
+
 if __name__ == "__main__":
+    start_time = time.time()
     # 1) dat 파일 경로
-    dat_path = "/home/rgblab/Arion_JetsonTX2_REDLAB/Arion_JetsonTX2_REDLAB/20251031-150459-4KHz-CH1.dat"
+    # dat_path = "/home/rgblab/Arion_JetsonTX2_REDLAB/Arion_JetsonTX2_REDLAB/20251031-150459-4KHz-CH1.dat"
+    dat_path = "/home/rgblab/Arion_JetsonTX2_REDLAB/Arion_JetsonTX2_REDLAB/20251031-151031-4KHz-CH1-broken.dat"
 
     # 2) 데이터 읽기
     x = load_dat_as_float(dat_path)
@@ -135,4 +138,6 @@ if __name__ == "__main__":
     plt.ylabel("Frequency (Hz)")
     plt.title(f"Segment {seg_idx} STFT magnitude (0~64 Hz)")
     plt.tight_layout()
-    plt.savefig("stft_segment_example.png", dpi=150)
+    plt.savefig("stft_segment_broken_example.png", dpi=150)
+    end_time = time.time()
+    print(f"[INFO] Total execution time: {end_time - start_time:.2f} seconds")
