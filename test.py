@@ -93,7 +93,7 @@ def run_onnx(onnx_path, input_numpy):
 # ------------------------------------------------------------------------------
 # 4. TensorRT Inference (using TRT Python API + PyCUDA)
 # ------------------------------------------------------------------------------
-def run_tensorrt(engine_path, input_num#py):
+def run_tensorrt(engine_path, input_numpy):
     print(f"\n[TensorRT] Loading {engine_path}...")
     
     if not os.path.exists(engine_path):
