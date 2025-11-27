@@ -34,7 +34,7 @@ Notes
 - For legacy TensorRT on TX2, opset 11 is typically the safest. Adjust if your JetPack supports newer.
 """
 
-from __future__ import annotations
+# from __future__ import annotations
 import argparse
 from pathlib import Path
 import os, time, shutil
@@ -49,6 +49,11 @@ try:
     from sklearn.model_selection import train_test_split
 except Exception:
     train_test_split = None
+
+print("torch_version:",torch.__version__)
+print("pytorch build in cuda:",torch.version.cuda)
+
+print("cuda available:",torch.cuda.is_available())
 
 # ----------------------
 # Model: small CNN for [N,12,64,50]
